@@ -1,16 +1,19 @@
-// Copyright 2024 Apache Software Foundation (ASF)
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+//   http://www.apache.org/licenses/LICENSE-2.0
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package e2e
 
@@ -60,6 +63,55 @@ const randomIntRange = 16384 //Set to large number to avoid cluster namespace na
 var (
 	upStatus string = "UP"
 )
+
+func kubectlApplyFileOnCluster(file, namespace string) error {
+	cmd := exec.Command("kubectl", "apply", "-f", file, "-n", namespace)
+	_, err := utils.Run(cmd)
+	return err
+}
+
+func kubectlDeleteFileOnCluster(file, namespace string) error {
+	cmd := exec.Command("kubectl", "delete", "-f", file, "-n", namespace)
+	_, err := utils.Run(cmd)
+	return err
+}
+
+func kubectlCreateNamespace(namespace string) error {
+	cmd := exec.Command("kubectl", "create", "namespace", namespace)
+	_, err := utils.Run(cmd)
+	return err
+}
+
+func kubectlNamespaceExists(namespace string) (bool, error) {
+	cmd := exec.Command("kubectl", "get", "namespace", "-o", fmt.Sprintf(`jsonpath={.items[?(@.metadata.name=="%s")].metadata.name}`, namespace))
+	output, err := utils.Run(cmd)
+	if err != nil {
+		return false, err
+	}
+	return len(output) > 0, nil
+}
+
+func kubectlDeleteNamespace(namespace string) error {
+	cmd := exec.Command("kubectl", "delete", "namespace", namespace)
+	_, err := utils.Run(cmd)
+	return err
+}
+
+func kubectlPatchSonataFlowImageAndRollout(namespace, workflowName, image string) error {
+	cmd := exec.Command("kubectl", "patch", "sonataflow", workflowName,
+		"--type", "json", "-n", namespace,
+		"-p", fmt.Sprintf(`[{"op": "replace", "path": "/spec/podTemplate/container/image", "value": "%s"}, {"op": "replace", "path": "/spec/podTemplate/replicas", "value": 1}]`, image))
+	_, err := utils.Run(cmd)
+	return err
+}
+
+func kubectlPatchSonataFlowScaleDown(namespace, workflowName string) error {
+	cmd := exec.Command("kubectl", "patch", "sonataflow", workflowName,
+		"--type", "json", "-n", namespace,
+		"-p", `[{"op": "replace", "path": "/spec/podTemplate/replicas", "value": 0}]`)
+	_, err := utils.Run(cmd)
+	return err
+}
 
 func getHealthFromPod(name, namespace string) (*health, error) {
 	// iterate over all containers to find the one that responds to the HTTP health endpoint
@@ -127,7 +179,7 @@ func getHealthStatusInContainer(podName string, containerName string, ns string)
 	return &h, nil
 }
 
-func verifyWorkflowIsInRunningStateInNamespace(workflowName string, ns string) bool {
+func verifyWorkflowIsInRunningState(workflowName string, ns string) bool {
 	cmd := exec.Command("kubectl", "get", "workflow", workflowName, "-n", ns, "-o", "jsonpath={.status.conditions[?(@.type=='Running')].status}")
 	response, err := utils.Run(cmd)
 	if err != nil {
@@ -146,10 +198,6 @@ func verifyWorkflowIsInRunningStateInNamespace(workflowName string, ns string) b
 		return false
 	}
 	return status
-}
-
-func verifyWorkflowIsInRunningState(workflowName string, targetNamespace string) bool {
-	return verifyWorkflowIsInRunningStateInNamespace(workflowName, targetNamespace)
 }
 
 func verifyWorkflowIsAddressable(workflowName string, targetNamespace string) bool {
@@ -222,7 +270,7 @@ func verifyKSinkInjection(label, ns string) bool {
 	return true
 }
 
-func waitForPodRestartCompletion(label, ns string) {
+func waitForPodRestartCompletion(label, ns string) (podRunning string) {
 	EventuallyWithOffset(1, func() bool {
 		cmd := exec.Command("kubectl", "get", "pod", "-n", ns, "-l", label, "-o", "jsonpath={.items[*].metadata.name}")
 		out, err := utils.Run(cmd)
@@ -238,15 +286,21 @@ func waitForPodRestartCompletion(label, ns string) {
 			GinkgoWriter.Println("multiple pods found")
 			return false // multiple pods found, wait for other pods to terminate
 		}
+		podRunning = podNames[0]
 		return true
-	}, 1*time.Minute, 5).Should(BeTrue())
+	}, 10*time.Minute, 5).Should(BeTrue())
+
+	return
 }
 
 func verifyTrigger(triggers []operatorapi.SonataFlowPlatformTriggerRef, namePrefix, path, ns, broker string) error {
 	GinkgoWriter.Println("Triggers from platform status:", triggers)
 	for _, ref := range triggers {
 		if strings.HasPrefix(ref.Name, namePrefix) && ref.Namespace == ns {
-			return verifyTriggerData(ref.Name, ns, path, broker)
+			EventuallyWithOffset(1, func() error {
+				return verifyTriggerData(ref.Name, ns, path, broker)
+			}, 2*time.Minute, 5).Should(Succeed())
+			return nil
 		}
 	}
 	return fmt.Errorf("failed to find trigger to verify with prefix: %v, namespace: %v", namePrefix, ns)
@@ -262,7 +316,7 @@ func verifyTriggerData(name, ns, path, broker string) error {
 	if len(data) == 3 && broker == data[0] && strings.HasSuffix(data[1], path) && data[2] == "True" {
 		return nil
 	}
-	return fmt.Errorf("failed to verify trigger %v, data=%s", name, string(out))
+	return fmt.Errorf("failed to verify trigger %v with namespace %v, path %v, broker %s, and received data=%s", name, ns, path, broker, string(out))
 }
 
 func verifySinkBinding(name, ns, broker string) error {
@@ -276,4 +330,73 @@ func verifySinkBinding(name, ns, broker string) error {
 		return nil
 	}
 	return fmt.Errorf("failed to verify sinkbinding %v, data=%s", name, string(out))
+}
+
+func getWorkflowId(resp string) (string, error) {
+	// First find the json data
+	ind1 := strings.Index(resp, "{")
+	ind2 := strings.LastIndex(resp, "}")
+	data := resp[ind1 : ind2+1]
+	// Retrieve the id from json data
+	m := make(map[string]interface{})
+	err := json.Unmarshal([]byte(data), &m)
+	if err != nil {
+		return "", err
+	}
+	if id, ok := m["id"].(string); ok {
+		return id, nil
+	}
+	return "", fmt.Errorf("failed to find workflow id")
+}
+
+func getMetricValue(resp string) (string, error) {
+	fmt.Println(resp)
+	ind1 := strings.Index(resp, "{")
+	ind2 := strings.LastIndex(resp, "}")
+	data := resp[ind1 : ind2+1]
+
+	// Retrieve the metric value from json data
+	m := make(map[string]interface{})
+	err := json.Unmarshal([]byte(data), &m)
+	if err != nil {
+		return "", err
+	}
+	result, ok := m["data"].(map[string]interface{})["result"]
+	if !ok {
+		return "", fmt.Errorf("no valid response data received")
+	}
+	metrics := result.([]interface{})
+	if len(metrics) == 0 {
+		return "", fmt.Errorf("no valid metric data retrieved")
+	}
+	metric := metrics[0]
+	values := metric.(map[string]interface{})["value"]
+	if val, ok := (values.([]interface{}))[1].(string); ok {
+		return val, nil
+	} else {
+		return "", fmt.Errorf("failed to get metric value")
+	}
+}
+
+func getPodNameAfterWorkflowInstCreation(name, ns string) (string, error) {
+	labels := fmt.Sprintf("sonataflow.org/workflow-app=%s,sonataflow.org/workflow-namespace=%s", name, ns)
+	cmd := exec.Command("kubectl", "get", "pod", "-n", ns, "-l", labels, "-o=jsonpath='{range .items[*]}{.metadata.name} {.status.conditions[?(@.type=='Ready')].status}{';'}{end}'")
+	fmt.Println(cmd.String())
+	out, err := utils.Run(cmd)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(string(out))
+	data := strings.Split(string(out), ";")
+	for _, line := range data {
+		res := strings.Fields(line)
+		if len(res) == 2 && strings.Contains(res[0], "-00002-deployment-") {
+			if res[1] == "True" {
+				return res[0], nil
+			} else {
+				return "", fmt.Errorf("pod %s is not ready=", res)
+			}
+		}
+	}
+	return "", fmt.Errorf("invalid data received: %s", string(out))
 }

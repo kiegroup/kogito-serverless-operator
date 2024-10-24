@@ -1,16 +1,19 @@
-// Copyright 2023 Red Hat, Inc. and/or its affiliates
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+//   http://www.apache.org/licenses/LICENSE-2.0
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package preview
 
@@ -26,6 +29,7 @@ import (
 
 	"github.com/apache/incubator-kie-kogito-serverless-operator/api"
 	operatorapi "github.com/apache/incubator-kie-kogito-serverless-operator/api/v1alpha08"
+	"github.com/apache/incubator-kie-kogito-serverless-operator/internal/controller/monitoring"
 	"github.com/apache/incubator-kie-kogito-serverless-operator/internal/controller/platform"
 	"github.com/apache/incubator-kie-kogito-serverless-operator/internal/controller/platform/services"
 	"github.com/apache/incubator-kie-kogito-serverless-operator/internal/controller/profiles/common"
@@ -154,12 +158,21 @@ func (d *DeploymentReconciler) ensureObjects(ctx context.Context, workflow *oper
 		return reconcile.Result{}, nil, err
 	}
 
+	objs := []client.Object{deployment, managedPropsCM, service}
 	eventingObjs, err := common.NewKnativeEventingHandler(d.StateSupport, pl).Ensure(ctx, workflow)
 	if err != nil {
 		return reconcile.Result{}, nil, err
 	}
+	objs = append(objs, eventingObjs...)
 
-	objs := []client.Object{deployment, managedPropsCM, service}
+	serviceMonitor, err := d.ensureServiceMonitor(ctx, workflow, pl)
+	if err != nil {
+		return reconcile.Result{}, nil, err
+	}
+	if serviceMonitor != nil {
+		objs = append(objs, serviceMonitor)
+	}
+
 	if deploymentOp == controllerutil.OperationResultCreated {
 		workflow.Status.Manager().MarkFalse(api.RunningConditionType, api.WaitingForDeploymentReason, "")
 		if _, err := d.PerformStatusUpdate(ctx, workflow); err != nil {
@@ -167,9 +180,15 @@ func (d *DeploymentReconciler) ensureObjects(ctx context.Context, workflow *oper
 		}
 		return reconcile.Result{RequeueAfter: constants.RequeueAfterFollowDeployment, Requeue: true}, objs, nil
 	}
-	objs = append(objs, eventingObjs...)
-
 	return reconcile.Result{}, objs, nil
+}
+
+func (d *DeploymentReconciler) ensureServiceMonitor(ctx context.Context, workflow *operatorapi.SonataFlow, pl *operatorapi.SonataFlowPlatform) (client.Object, error) {
+	if monitoring.IsMonitoringEnabled(pl) {
+		serviceMonitor, _, err := d.ensurers.ServiceMonitorByDeploymentModel(workflow).Ensure(ctx, workflow)
+		return serviceMonitor, err
+	}
+	return nil, nil
 }
 
 func (d *DeploymentReconciler) deploymentModelMutateVisitors(

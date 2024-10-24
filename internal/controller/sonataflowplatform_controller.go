@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/apache/incubator-kie-kogito-serverless-operator/internal/controller/knative"
+	"github.com/apache/incubator-kie-kogito-serverless-operator/internal/controller/monitoring"
 	sourcesv1 "knative.dev/eventing/pkg/apis/sources/v1"
 
 	"k8s.io/klog/v2"
@@ -134,6 +135,16 @@ func (r *SonataFlowPlatformReconciler) Reconcile(ctx context.Context, req reconc
 			return reconcile.Result{}, err
 		}
 		return reconcile.Result{}, nil
+	}
+
+	if monitoring.IsMonitoringEnabled(&instance) {
+		monitoringAvail, err := monitoring.GetPrometheusAvailability(r.Config)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		if !monitoringAvail {
+			r.Recorder.Event(&instance, corev1.EventTypeWarning, "PrometheusNotAvailable", fmt.Sprintf("Monitoring is enabled in platform %s, but Prometheus is not installed", instance.Name))
+		}
 	}
 
 	for _, a := range actions {
@@ -251,17 +262,24 @@ func (r *SonataFlowPlatformReconciler) updateIfActiveClusterPlatformExists(ctx c
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *SonataFlowPlatformReconciler) SetupWithManager(mgr ctrlrun.Manager) error {
-	return ctrlrun.NewControllerManagedBy(mgr).
+	builder := ctrlrun.NewControllerManagedBy(mgr).
 		For(&operatorapi.SonataFlowPlatform{}).
 		Owns(&appsv1.Deployment{}).
 		Owns(&corev1.Service{}).
 		Owns(&corev1.ConfigMap{}).
-		Owns(&eventingv1.Trigger{}).
-		Owns(&sourcesv1.SinkBinding{}).
 		Watches(&operatorapi.SonataFlowPlatform{}, handler.EnqueueRequestsFromMapFunc(r.mapPlatformToPlatformRequests)).
-		Watches(&operatorapi.SonataFlowClusterPlatform{}, handler.EnqueueRequestsFromMapFunc(r.mapClusterPlatformToPlatformRequests)).
-		Watches(&eventingv1.Trigger{}, handler.EnqueueRequestsFromMapFunc(knative.MapTriggerToPlatformRequests)).
-		Complete(r)
+		Watches(&operatorapi.SonataFlowClusterPlatform{}, handler.EnqueueRequestsFromMapFunc(r.mapClusterPlatformToPlatformRequests))
+
+	knativeAvail, err := knative.GetKnativeAvailability(mgr.GetConfig())
+	if err != nil {
+		return err
+	}
+	if knativeAvail.Eventing {
+		builder = builder.Owns(&eventingv1.Trigger{}).
+			Owns(&sourcesv1.SinkBinding{}).
+			Watches(&eventingv1.Trigger{}, handler.EnqueueRequestsFromMapFunc(knative.MapTriggerToPlatformRequests))
+	}
+	return builder.Complete(r)
 }
 
 // if active clusterplatform object is changed, reconcile all SonataFlowPlatforms in the cluster.

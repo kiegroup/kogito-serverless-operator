@@ -119,9 +119,11 @@ vet: ## Run go vet against code.
 
 .PHONY: test
 test: manifests generate envtest test-api ## Run tests.
+	@$(MAKE) addheaders
+	@$(MAKE) vet
+	@$(MAKE) fmt
 	@echo "🔍 Running controller tests..."
-	@KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" \
-	go test $(shell go list ./... | grep -v /test/) -coverprofile cover.out > /dev/null 2>&1
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test $(shell go list ./... | grep -v /test/) -coverprofile cover.out
 	@echo "✅  Tests completed successfully. Coverage report generated: cover.out."
 
 .PHONY: test-api
@@ -254,13 +256,15 @@ GOLANGCI_LINT = $(LOCALBIN)/golangci-lint-$(GOLANGCI_LINT_VERSION)
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.4.1
-CONTROLLER_TOOLS_VERSION ?= v0.15.0
+CONTROLLER_TOOLS_VERSION ?= v0.16.4
 ENVTEST_VERSION ?= release-0.18
 GOLANGCI_LINT_VERSION ?= v1.57.2
 
 KIND_VERSION ?= v0.20.0
 KNATIVE_VERSION ?= v1.13.2
 TIMEOUT_SECS ?= 180s
+PROMETHEUS_VERSION ?= v0.70.0
+GRAFANA_VERSION ?= v5.13.0
 
 KNATIVE_SERVING_PREFIX ?= "https://github.com/knative/serving/releases/download/knative-$(KNATIVE_VERSION)"
 KNATIVE_EVENTING_PREFIX ?= "https://github.com/knative/eventing/releases/download/knative-$(KNATIVE_VERSION)"
@@ -399,30 +403,35 @@ generate-all: generate generate-deploy bundle
 	@$(MAKE) fmt
 
 .PHONY: test-e2e # You will need to have a Minikube/Kind cluster up and running to run this target, and run container-builder before the test
-label = "flows-non-persistence" # possible values are flows-non-persistence, flows-persistence, platform, cluster
+label = "flows-ephemeral" # possible values are flows-ephemeral, flows-persistence, flows-monitoring, platform, cluster
 test-e2e:
 ifeq ($(label), cluster)
 	@echo "🌐 Running e2e tests for cluster..."
 	go test ./test/e2e/e2e_suite_test.go ./test/e2e/helpers.go ./test/e2e/clusterplatform_test.go \
 	-v -ginkgo.v -ginkgo.no-color -ginkgo.github-output -ginkgo.label-filter=$(label) \
-	-ginkgo.junit-report=./e2e-test-report-clusterplatform_test.xml -timeout 60m;
+	-ginkgo.junit-report=./e2e-test-report-clusterplatform_test.xml -timeout 60m KUSTOMIZE=$(KUSTOMIZE);
 else ifeq ($(label), platform)
 	@echo "📦 Running e2e tests for platform..."
 	go test ./test/e2e/e2e_suite_test.go ./test/e2e/helpers.go ./test/e2e/platform_test.go \
 	-v -ginkgo.v -ginkgo.no-color -ginkgo.github-output -ginkgo.label-filter=$(label) \
-	-ginkgo.junit-report=./e2e-test-report-platform_test.xml -timeout 60m;
-else ifeq ($(label), flows-non-persistence)
-	@echo "🔄 Running e2e tests for flows-non-persistence..."
+	-ginkgo.junit-report=./e2e-test-report-platform_test.xml -timeout 60m KUSTOMIZE=$(KUSTOMIZE);
+else ifeq ($(label), flows-ephemeral)
+	@echo "🔄 Running e2e tests for flows-ephemeral..."
 	go test ./test/e2e/e2e_suite_test.go ./test/e2e/helpers.go ./test/e2e/workflow_test.go \
 	-v -ginkgo.v -ginkgo.no-color -ginkgo.github-output -ginkgo.label-filter=$(label) \
-	-ginkgo.junit-report=./e2e-test-report-workflow_test.xml -timeout 60m;
+	-ginkgo.junit-report=./e2e-test-report-workflow_test.xml -timeout 60m KUSTOMIZE=$(KUSTOMIZE);
 else ifeq ($(label), flows-persistence)
 	@echo "🔁 Running e2e tests for flows-persistence..."
 	go test ./test/e2e/e2e_suite_test.go ./test/e2e/helpers.go ./test/e2e/workflow_test.go \
 	-v -ginkgo.v -ginkgo.no-color -ginkgo.github-output -ginkgo.label-filter=$(label) \
-	-ginkgo.junit-report=./e2e-test-report-workflow_test.xml -timeout 60m;
+	-ginkgo.junit-report=./e2e-test-report-workflow_test.xml -timeout 60m KUSTOMIZE=$(KUSTOMIZE);
+else ifeq ($(label), flows-monitoring)
+	@echo "🔁 Running e2e tests for flows-monitoring..."
+	go test ./test/e2e/e2e_suite_test.go ./test/e2e/helpers.go ./test/e2e/workflow_test.go \
+	-v -ginkgo.v -ginkgo.no-color -ginkgo.github-output -ginkgo.label-filter=$(label) \
+	-ginkgo.junit-report=./e2e-test-report-workflow_test.xml -timeout 60m KUSTOMIZE=$(KUSTOMIZE);
 else
-	@echo "❌  Invalid label. Please use one of: cluster, platform, flows-non-persistence, flows-persistence"
+	@echo "❌  Invalid label. Please use one of: cluster, platform, flows-ephemeral, flows-persistence, flows-monitoring"
 endif
 
 
@@ -447,6 +456,18 @@ deploy-knative:
 	kubectl wait  --for=condition=Ready=True KnativeServing/knative-serving -n knative-serving --timeout=$(TIMEOUT_SECS)
 	kubectl wait  --for=condition=Ready=True KnativeEventing/knative-eventing -n knative-eventing --timeout=$(TIMEOUT_SECS)
 	
+.PHONY: deploy-prometheus
+deploy-prometheus: create-cluster
+	kubectl create -f https://github.com/prometheus-operator/prometheus-operator/releases/download/$(PROMETHEUS_VERSION)/bundle.yaml
+	kubectl wait  --for=condition=Available=True deploy/prometheus-operator -n default --timeout=$(TIMEOUT_SECS)
+	kubectl apply -f ./test/testdata/prometheus.yaml -n default
+	kubectl wait  --for=condition=Available=True prometheus/prometheus -n default --timeout=$(TIMEOUT_SECS)
+
+.PHONY: deploy-grafana
+deploy-grafana: create-cluster
+	kubectl create -f https://github.com/grafana/grafana-operator/releases/download/$(GRAFANA_VERSION)/kustomize-cluster_scoped.yaml
+	kubectl wait  --for=condition=Available=True deploy/grafana-operator-controller-manager -n grafana --timeout=$(TIMEOUT_SECS)
+
 .PHONY: delete-cluster
 delete-cluster: install-kind
 	kind delete cluster && $(BUILDER) rm -f kind-registry
