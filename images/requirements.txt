@@ -8,7 +8,7 @@ lxml==5.2.1
 docker==7.0.0
 docker-squash==1.2.0
 python-docker
-elementpath==4.4.0
+elementpath==4.6.0
 pyyaml==6.0.1
 ruamel.yaml==0.18.6
 python-dateutil==2.9.0.post0
