@@ -11,7 +11,7 @@ require (
 	github.com/jpillora/backoff v1.0.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.28.0
 	k8s.io/api v0.31.1
 	k8s.io/apimachinery v0.31.1
