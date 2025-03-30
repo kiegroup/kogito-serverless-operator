@@ -34,7 +34,7 @@ require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.2 // indirect
 	github.com/RHsyseng/operator-utils v1.4.13 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
-	github.com/apache/incubator-kie-kogito-serverless-operator/container-builder v0.0.0 // indirect
+	github.com/apache/incubator-kie-kogito-serverless-operator/container-builder v1.44.1 // indirect
 	github.com/apache/incubator-kie-kogito-serverless-operator/workflowproj v0.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
