@@ -6,7 +6,7 @@ go 1.22.0
 replace github.com/apache/incubator-kie-kogito-serverless-operator/api => ../api
 
 require (
-	github.com/apache/incubator-kie-kogito-serverless-operator/api v0.0.0
+	github.com/apache/incubator-kie-kogito-serverless-operator/api v1.44.1
 	github.com/pb33f/libopenapi v0.8.4
 	github.com/pkg/errors v0.9.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.0

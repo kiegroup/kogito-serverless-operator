@@ -13,7 +13,7 @@ replace (
 
 require (
 	github.com/apache/incubator-kie-kogito-serverless-operator v0.0.0
-	github.com/apache/incubator-kie-kogito-serverless-operator/api v0.0.0
+	github.com/apache/incubator-kie-kogito-serverless-operator/api v1.44.1
 	github.com/apache/incubator-kie-kogito-serverless-operator/bddframework v0.0.0
 	github.com/cucumber/godog v0.12.5
 	github.com/cucumber/messages-go/v16 v16.0.1
