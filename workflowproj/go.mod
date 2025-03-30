@@ -9,7 +9,7 @@ require (
 	github.com/apache/incubator-kie-kogito-serverless-operator/api v0.0.0
 	github.com/pb33f/libopenapi v0.8.4
 	github.com/pkg/errors v0.9.1
-	github.com/santhosh-tekuri/jsonschema/v5 v5.3.0
+	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/serverlessworkflow/sdk-go/v2 v2.4.2
 	github.com/stretchr/testify v1.9.0
 	k8s.io/api v0.31.1
