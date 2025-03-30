@@ -35,7 +35,7 @@ require (
 	github.com/RHsyseng/operator-utils v1.4.13 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
 	github.com/apache/incubator-kie-kogito-serverless-operator/container-builder v0.0.0 // indirect
-	github.com/apache/incubator-kie-kogito-serverless-operator/workflowproj v0.0.0 // indirect
+	github.com/apache/incubator-kie-kogito-serverless-operator/workflowproj v1.44.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/blendle/zapdriver v1.3.1 // indirect
