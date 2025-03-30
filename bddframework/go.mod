@@ -31,7 +31,7 @@ require (
 
 require (
 	github.com/RHsyseng/operator-utils v1.4.13
-	github.com/apache/incubator-kie-kogito-serverless-operator v0.0.0
+	github.com/apache/incubator-kie-kogito-serverless-operator v1.44.1
 	github.com/google/uuid v1.6.0
 	github.com/openshift/client-go v0.0.0-20240528061634-b054aa794d87
 	github.com/stretchr/testify v1.9.0
