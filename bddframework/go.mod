@@ -6,7 +6,7 @@ go 1.22.0
 replace github.com/apache/incubator-kie-kogito-serverless-operator => ../
 
 require (
-	github.com/cucumber/gherkin-go/v19 v19.0.3
+	github.com/cucumber/gherkin-go/v24 v24.1.0
 	github.com/cucumber/godog v0.12.5
 	github.com/cucumber/messages-go/v16 v16.0.1
 	github.com/go-logr/logr v1.4.2
