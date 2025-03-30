@@ -90,8 +90,8 @@ require (
 	github.com/prometheus/common v0.55.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/prometheus/statsd_exporter v0.22.7 // indirect
-	github.com/rickb777/date v1.13.0 // indirect
-	github.com/rickb777/plural v1.2.1 // indirect
+	github.com/rickb777/date v1.21.1 // indirect
+	github.com/rickb777/plural v1.4.2 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
