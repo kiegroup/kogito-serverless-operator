@@ -27,7 +27,7 @@ import (
 	"github.com/apache/incubator-kie-kogito-serverless-operator/bddframework/pkg/framework/operator"
 	"github.com/apache/incubator-kie-kogito-serverless-operator/bddframework/pkg/meta"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 
