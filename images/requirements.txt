@@ -15,7 +15,7 @@ python-dateutil==2.9.0.post0
 Jinja2==3.1.4
 pykwalify==1.8.0
 colorlog==6.8.2
-click==8.1.7
+click==8.2.1
 odcs
 behave
 krb5
