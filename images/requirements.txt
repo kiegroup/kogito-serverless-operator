@@ -1,7 +1,7 @@
 # Requirements for cekit 4.11.0 build
 # see: https://pip.pypa.io/en/stable/reference/requirements-file-format/
 
-requests<2.32.0
+requests<2.32.5
 cekit==4.11.0
 behave==1.2.6
 lxml==5.2.1
