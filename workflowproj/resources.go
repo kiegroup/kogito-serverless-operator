@@ -24,7 +24,7 @@ import (
 
 	"github.com/pb33f/libopenapi"
 	libopenapiutils "github.com/pb33f/libopenapi/utils"
-	"github.com/santhosh-tekuri/jsonschema/v5"
+	"github.com/santhosh-tekuri/jsonschema/v6"
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
