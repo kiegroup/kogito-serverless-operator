@@ -15,7 +15,7 @@ require (
 	github.com/apache/incubator-kie-kogito-serverless-operator/container-builder v0.0.0
 	github.com/apache/incubator-kie-kogito-serverless-operator/workflowproj v0.0.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
-	github.com/go-logr/logr v1.4.2 // indirect
+	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/imdario/mergo v0.3.16
 	github.com/magiconair/properties v1.8.7
 	github.com/onsi/ginkgo/v2 v2.19.0
