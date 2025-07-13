@@ -2,7 +2,7 @@ module github.com/apache/incubator-kie-kogito-serverless-operator/container-buil
 
 go 1.22.0
 
-toolchain go1.22.4
+toolchain go1.24.5
 
 require (
 	github.com/docker/docker v25.0.6+incompatible
