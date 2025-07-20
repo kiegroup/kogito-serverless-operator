@@ -20,7 +20,7 @@
 package v1alpha08
 
 import (
-	"github.com/serverlessworkflow/sdk-go/v2/model"
+	"github.com/serverlessworkflow/sdk-go/v3/model"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"

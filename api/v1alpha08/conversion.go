@@ -26,7 +26,7 @@ import (
 	"regexp"
 	"strings"
 
-	cncfmodel "github.com/serverlessworkflow/sdk-go/v2/model"
+	cncfmodel "github.com/serverlessworkflow/sdk-go/v3/model"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	controllerruntime "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/yaml"

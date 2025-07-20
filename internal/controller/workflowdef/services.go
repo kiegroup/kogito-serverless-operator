@@ -19,7 +19,7 @@ package workflowdef
 
 import (
 	operatorapi "github.com/apache/incubator-kie-kogito-serverless-operator/api/v1alpha08"
-	cncfmodel "github.com/serverlessworkflow/sdk-go/v2/model"
+	cncfmodel "github.com/serverlessworkflow/sdk-go/v3/model"
 )
 
 func ContainsEventKind(workflow *operatorapi.SonataFlow, eventKind cncfmodel.EventKind) bool {

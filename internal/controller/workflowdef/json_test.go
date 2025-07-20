@@ -23,7 +23,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/serverlessworkflow/sdk-go/v2/model"
+	"github.com/serverlessworkflow/sdk-go/v3/model"
 	"github.com/stretchr/testify/assert"
 
 	operatorapi "github.com/apache/incubator-kie-kogito-serverless-operator/api/v1alpha08"

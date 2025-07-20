@@ -28,7 +28,7 @@ import (
 
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
-	cncfmodel "github.com/serverlessworkflow/sdk-go/v2/model"
+	cncfmodel "github.com/serverlessworkflow/sdk-go/v3/model"
 
 	"github.com/imdario/mergo"
 	prometheus "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"

@@ -20,7 +20,7 @@
 package v1alpha08
 
 import (
-	cncfmodel "github.com/serverlessworkflow/sdk-go/v2/model"
+	cncfmodel "github.com/serverlessworkflow/sdk-go/v3/model"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"knative.dev/pkg/apis"

@@ -23,7 +23,7 @@ import (
 	operatorapi "github.com/apache/incubator-kie-kogito-serverless-operator/api/v1alpha08"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	cncfmodel "github.com/serverlessworkflow/sdk-go/v2/model"
+	cncfmodel "github.com/serverlessworkflow/sdk-go/v3/model"
 )
 
 var (

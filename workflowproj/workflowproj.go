@@ -27,8 +27,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/serverlessworkflow/sdk-go/v2/model"
-	"github.com/serverlessworkflow/sdk-go/v2/parser"
+	"github.com/serverlessworkflow/sdk-go/v3/model"
+	"github.com/serverlessworkflow/sdk-go/v3/parser"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"

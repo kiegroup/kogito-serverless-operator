@@ -23,7 +23,7 @@ import (
 	"github.com/apache/incubator-kie-kogito-serverless-operator/internal/controller/profiles/common/constants"
 	"github.com/apache/incubator-kie-kogito-serverless-operator/internal/controller/workflowdef"
 	"github.com/magiconair/properties"
-	cncfmodel "github.com/serverlessworkflow/sdk-go/v2/model"
+	cncfmodel "github.com/serverlessworkflow/sdk-go/v3/model"
 )
 
 // generateKnativeEventingWorkflowProperties returns the set of application properties required for the workflow to produce or consume
