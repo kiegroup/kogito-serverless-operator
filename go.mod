@@ -1,6 +1,8 @@
 module github.com/apache/incubator-kie-kogito-serverless-operator
 
-go 1.22.0
+go 1.24.1
+
+toolchain go1.24.4
 
 // Internal dependencies
 replace (
@@ -97,7 +99,7 @@ require (
 	github.com/prometheus/statsd_exporter v0.22.7 // indirect
 	github.com/relvacode/iso8601 v1.4.0 // indirect
 	github.com/rickb777/date v1.13.0 // indirect
-	github.com/rickb777/plural v1.2.1 // indirect
+	github.com/rickb777/plural v1.4.4 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.0 // indirect
 	github.com/sosodev/duration v1.3.1 // indirect
@@ -111,10 +113,10 @@ require (
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/oauth2 v0.21.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/term v0.25.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/text v0.25.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
