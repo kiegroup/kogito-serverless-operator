@@ -1,6 +1,8 @@
 module github.com/apache/incubator-kie-kogito-serverless-operator/api
 
-go 1.22.0
+go 1.23.0
+
+toolchain go1.24.4
 
 require (
 	github.com/serverlessworkflow/sdk-go/v2 v2.4.2
@@ -53,7 +55,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	golang.org/x/crypto v0.28.0 // indirect
-	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
+	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792 // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/oauth2 v0.21.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
