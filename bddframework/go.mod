@@ -16,7 +16,7 @@ require (
 	github.com/openshift/api v0.0.0-20240618205917-987b8890c273
 	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20200321030439-57b580e57e88
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.55.1
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/pflag v1.0.7
 	go.uber.org/zap v1.26.0
 	gopkg.in/src-d/go-git.v4 v4.13.1
 	gopkg.in/yaml.v2 v2.4.0

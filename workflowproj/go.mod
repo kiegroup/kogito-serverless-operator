@@ -59,7 +59,7 @@ require (
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/relvacode/iso8601 v1.4.0 // indirect
 	github.com/sosodev/duration v1.3.1 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.7 // indirect
 	github.com/vmware-labs/yaml-jsonpath v0.3.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	golang.org/x/crypto v0.28.0 // indirect

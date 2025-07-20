@@ -20,7 +20,7 @@ require (
 	github.com/openshift/api v0.0.0-20240618205917-987b8890c273
 	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20200321030439-57b580e57e88
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.55.1
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/pflag v1.0.7
 	k8s.io/api v0.31.1
 	k8s.io/apiextensions-apiserver v0.31.0
 	k8s.io/apimachinery v0.31.1
