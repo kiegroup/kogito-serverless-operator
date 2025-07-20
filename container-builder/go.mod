@@ -5,7 +5,7 @@ go 1.22.0
 toolchain go1.22.4
 
 require (
-	github.com/docker/docker v25.0.6+incompatible
+	github.com/docker/docker v25.0.12+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/google/uuid v1.6.0
 	github.com/jpillora/backoff v1.0.0
