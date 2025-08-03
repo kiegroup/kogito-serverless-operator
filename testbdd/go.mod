@@ -17,7 +17,7 @@ require (
 	github.com/apache/incubator-kie-kogito-serverless-operator/bddframework v0.0.0
 	github.com/cucumber/godog v0.12.5
 	github.com/cucumber/messages-go/v16 v16.0.1
-	github.com/openshift/api v0.0.0-20240618205917-987b8890c273
+	github.com/openshift/api c7fbd085e10c
 	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20200321030439-57b580e57e88
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.55.1
 	github.com/spf13/pflag v1.0.5
