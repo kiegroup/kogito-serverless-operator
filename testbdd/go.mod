@@ -1,6 +1,8 @@
 module github.com/apache/incubator-kie-kogito-serverless-operator/testbdd
 
-go 1.22.0
+go 1.23
+
+toolchain go1.24.4
 
 replace (
 	github.com/apache/incubator-kie-kogito-serverless-operator => ../
@@ -148,7 +150,7 @@ require (
 	knative.dev/networking v0.0.0-20231017124814-2a7676e912b7 // indirect
 	knative.dev/pkg v0.0.0-20231023151236-29775d7c9e5c // indirect
 	knative.dev/serving v0.39.4 // indirect
-	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
+	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )

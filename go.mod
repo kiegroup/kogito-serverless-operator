@@ -1,6 +1,8 @@
 module github.com/apache/incubator-kie-kogito-serverless-operator
 
-go 1.22.0
+go 1.23
+
+toolchain go1.24.4
 
 // Internal dependencies
 replace (
@@ -130,6 +132,6 @@ require (
 	k8s.io/apiextensions-apiserver v0.31.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340 // indirect
 	knative.dev/networking v0.0.0-20231017124814-2a7676e912b7 // indirect
-	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
+	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 )
